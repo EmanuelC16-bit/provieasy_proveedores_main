@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:provieasy_proveedores_main/pages/DetailsPage.dart';
+import 'package:provieasy_proveedores_main/pages/AccountPage.dart';
+import 'DetailsPage.dart';
+import 'package:provieasy_proveedores_main/pages/ProposalsPage.dart';
 
-const _baseColor = Color.fromARGB(255, 179, 157, 219);
+const Color _baseColor = Color.fromARGB(255, 179, 157, 219);
 
 class ProviderHomePage extends StatefulWidget {
   const ProviderHomePage({Key? key}) : super(key: key);
@@ -13,14 +15,17 @@ class ProviderHomePage extends StatefulWidget {
 
 class _ProviderHomePageState extends State<ProviderHomePage> {
   int _selectedIndex = 0;
-
-  static const List<Widget> _pages = [
-    _ProviderRequestsPage(),
-    _ProposalsPage(),
-    _AccountPage(),
+  static final List<Widget> _pages = [
+    const _ProviderRequestsPage(),
+    const ProposalsPage(),
+    const AccountPage(),
   ];
 
-  void _onItemTapped(int index) => setState(() => _selectedIndex = index);
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -41,18 +46,9 @@ class _ProviderHomePageState extends State<ProviderHomePage> {
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Requests',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.send),
-            label: 'Proposals',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Account',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Requests'),
+          BottomNavigationBarItem(icon: Icon(Icons.send), label: 'Proposals'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Account'),
         ],
       ),
     );
@@ -64,8 +60,7 @@ class _ProviderRequestsPage extends StatelessWidget {
 
   Widget _sectionTitle(String title) => Padding(
         padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        child: Text(title,
-            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+        child: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
       );
 
   Widget _requestCard(
@@ -93,24 +88,17 @@ class _ProviderRequestsPage extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                     child: Text(clientName,
-                        style: const TextStyle(
-                            fontSize: 16, fontWeight: FontWeight.w600))),
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
               ],
             ),
             const SizedBox(height: 8),
-            Text(serviceTitle,
-                style: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.w500)),
+            Text(serviceTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             const SizedBox(height: 4),
             Text(serviceDescription, style: const TextStyle(fontSize: 14)),
             const SizedBox(height: 4),
-            Text('Distance: ${distance.toStringAsFixed(1)} km',
-                style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            Text('Distance: ${distance.toStringAsFixed(1)} km', style: const TextStyle(fontSize: 12, color: Colors.black54)),
             const SizedBox(height: 4),
-            Text(
-              'Requested: ${DateFormat.yMMMd().add_jm().format(requestedAt)}',
-              style: const TextStyle(fontSize: 12, color: Colors.black54),
-            ),
+            Text('Requested: ${DateFormat.yMMMd().add_jm().format(requestedAt)}', style: const TextStyle(fontSize: 12, color: Colors.black54)),
             const SizedBox(height: 12),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -136,7 +124,7 @@ class _ProviderRequestsPage extends StatelessWidget {
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: () {
-                    // TODO: decline logic using requestId
+                    // TODO: decline logic
                   },
                   child: const Text('Decline'),
                 ),
@@ -183,20 +171,6 @@ class _ProviderRequestsPage extends StatelessWidget {
             r['distance'],
           ),
       ],
-    );
-  }
-}
-
-class _ProposalsPage extends StatelessWidget {
-  const _ProposalsPage({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'No proposals yet',
-        style: TextStyle(fontSize: 16, color: Colors.black54),
-      ),
     );
   }
 }

@@ -167,23 +167,23 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Text("Don’t have an account? "),
-                          GestureDetector(
-                            onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('Sign up clicked'))),
-                            child: const Text(
-                              "Sign Up",
-                              style: TextStyle(
-                                color: Colors.purple,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
+                      // Row(
+                      //   mainAxisAlignment: MainAxisAlignment.center,
+                      //   children: [
+                      //     const Text("Don’t have an account? "),
+                      //     GestureDetector(
+                      //       onTap: () => ScaffoldMessenger.of(context).showSnackBar(
+                      //           const SnackBar(content: Text('Sign up clicked'))),
+                      //       child: const Text(
+                      //         "Sign Up",
+                      //         style: TextStyle(
+                      //           color: Colors.purple,
+                      //           fontWeight: FontWeight.bold,
+                      //         ),
+                      //       ),
+                      //     ),
+                      //   ],
+                      // ),
                     ],
                   ),
                 ),
