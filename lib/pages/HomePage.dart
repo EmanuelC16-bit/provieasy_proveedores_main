@@ -1,109 +1,215 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
+import 'package:provieasy_proveedores_main/pages/DetailsPage.dart';
 
-void main() => runApp(MyApp());
+const _baseColor = Color.fromARGB(255, 179, 157, 219);
 
-class MyApp extends StatelessWidget {
+class ProviderHomePage extends StatefulWidget {
+  const ProviderHomePage({Key? key}) : super(key: key);
+
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: ProviderHomePage(),
-    );
-  }
+  _ProviderHomePageState createState() => _ProviderHomePageState();
 }
 
-class ProviderHomePage extends StatelessWidget {
-  Widget sectionTitle(String title) => Padding(
-    padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 16.0),
-    child: Text(
-      title,
-      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-    ),
-  );
+class _ProviderHomePageState extends State<ProviderHomePage> {
+  int _selectedIndex = 0;
 
-  Widget requestCard(String name, String rating, String distance, String pickup, String dropoff, {bool showActions = true}) => Card(
-    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-    child: Padding(
-      padding: const EdgeInsets.all(12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              CircleAvatar(radius: 24, backgroundImage: AssetImage('assets/profile_placeholder.png')),
-              SizedBox(width: 12),
-              Expanded(child: Text(name, style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600))),
-              Text(rating, style: TextStyle(color: Colors.grey[700]))
-            ],
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              Icon(Icons.navigation, size: 16),
-              SizedBox(width: 4),
-              Text(distance),
-            ],
-          ),
-          SizedBox(height: 4),
-          Text("📍 $pickup"),
-          Text("📍 $dropoff"),
-          if (showActions)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                TextButton(onPressed: () {}, child: Text("Decline")),
-                ElevatedButton(onPressed: () {}, child: Text("Accept")),
-              ],
-            )
-        ],
-      ),
-    ),
-  );
+  static const List<Widget> _pages = [
+    _ProviderRequestsPage(),
+    _ProposalsPage(),
+    _AccountPage(),
+  ];
 
-  Widget ongoingServiceCard(String name, String rating, String address) => Card(
-    margin: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-    child: ListTile(
-      leading: CircleAvatar(backgroundImage: AssetImage('assets/profile_placeholder.png')),
-      title: Text(name),
-      subtitle: Text(rating),
-      trailing: ElevatedButton(
-        onPressed: () {},
-        child: Text("Go to Pickup"),
-        style: ElevatedButton.styleFrom(
-          shape: StadiumBorder(),
-        ),
-      ),
-    ),
-  );
+  void _onItemTapped(int index) => setState(() => _selectedIndex = index);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: _baseColor,
       appBar: AppBar(
-        title: Text("Pending Requests"),
-        backgroundColor: Colors.blue[700],
+        title: const Text('ProviEasy', style: TextStyle(color: Colors.black)),
+        backgroundColor: _baseColor,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black),
       ),
-      body: ListView(
-        children: [
-          sectionTitle("Pending Requests"),
-          requestCard("Emily Clark", "⭐ 4.3", "4.2 km", "54 rue du Gue Jacquet", "66, av rue l'Alouette"),
-          requestCard("Kyle Hall", "⭐ 4.3", "1.0 km", "33 avenue Jean Jaurès", "47 rue de l'Alouette"),
-          sectionTitle("Ongoing Services"),
-          ongoingServiceCard("Vitt Xtra", "⭐ 4.3", "25 place Paul Doumer"),
-          sectionTitle("Rejected Services"),
-          requestCard("Melissa Brunt", "⭐ 4.3", "", "", "", showActions: false),
-        ],
-      ),
+      body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: 0,
-        selectedItemColor: Colors.blue,
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: const Color.fromARGB(255, 126, 87, 194),
+        selectedItemColor: Colors.white,
         unselectedItemColor: Colors.grey,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: "Earnings"),
-          BottomNavigationBarItem(icon: Icon(Icons.history), label: "History"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Account"),
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Requests',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.send),
+            label: 'Proposals',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Account',
+          ),
         ],
+      ),
+    );
+  }
+}
+
+class _ProviderRequestsPage extends StatelessWidget {
+  const _ProviderRequestsPage({Key? key}) : super(key: key);
+
+  Widget _sectionTitle(String title) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        child: Text(title,
+            style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      );
+
+  Widget _requestCard(
+    BuildContext context,
+    String clientName,
+    String serviceTitle,
+    String serviceDescription,
+    DateTime requestedAt,
+    String requestId,
+    double distance,
+  ) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const CircleAvatar(
+                  radius: 24,
+                  backgroundImage: AssetImage('assets/profile_placeholder.png'),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                    child: Text(clientName,
+                        style: const TextStyle(
+                            fontSize: 16, fontWeight: FontWeight.w600))),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(serviceTitle,
+                style: const TextStyle(
+                    fontSize: 16, fontWeight: FontWeight.w500)),
+            const SizedBox(height: 4),
+            Text(serviceDescription, style: const TextStyle(fontSize: 14)),
+            const SizedBox(height: 4),
+            Text('Distance: ${distance.toStringAsFixed(1)} km',
+                style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            const SizedBox(height: 4),
+            Text(
+              'Requested: ${DateFormat.yMMMd().add_jm().format(requestedAt)}',
+              style: const TextStyle(fontSize: 12, color: Colors.black54),
+            ),
+            const SizedBox(height: 12),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ProviderRequestDetailsPage(
+                          clientName: clientName,
+                          serviceTitle: serviceTitle,
+                          serviceDescription: serviceDescription,
+                          requestedAt: requestedAt,
+                          requestId: requestId,
+                          distance: distance,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Propose Price'),
+                ),
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: () {
+                    // TODO: decline logic using requestId
+                  },
+                  child: const Text('Decline'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final List<Map<String, dynamic>> sample = [
+      {
+        'clientName': 'Emily Clark',
+        'serviceTitle': 'Home Cleaning',
+        'serviceDescription': 'Deep clean kitchen and bathroom.',
+        'requestedAt': DateTime.now().subtract(const Duration(hours: 2)),
+        'requestId': 'req_001',
+        'distance': 3.4,
+      },
+      {
+        'clientName': 'Carlos Mendoza',
+        'serviceTitle': 'Gardening Service',
+        'serviceDescription': 'Trim hedges and mow lawn.',
+        'requestedAt': DateTime.now().subtract(const Duration(hours: 5)),
+        'requestId': 'req_002',
+        'distance': 8.2,
+      },
+    ];
+
+    return ListView(
+      children: [
+        _sectionTitle('Pending Requests'),
+        for (var r in sample)
+          _requestCard(
+            context,
+            r['clientName'],
+            r['serviceTitle'],
+            r['serviceDescription'],
+            r['requestedAt'],
+            r['requestId'],
+            r['distance'],
+          ),
+      ],
+    );
+  }
+}
+
+class _ProposalsPage extends StatelessWidget {
+  const _ProposalsPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        'No proposals yet',
+        style: TextStyle(fontSize: 16, color: Colors.black54),
+      ),
+    );
+  }
+}
+
+class _AccountPage extends StatelessWidget {
+  const _AccountPage({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Text(
+        'Account',
+        style: TextStyle(fontSize: 16, color: Colors.black54),
       ),
     );
   }
