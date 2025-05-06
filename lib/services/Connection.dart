@@ -63,7 +63,7 @@ Future<void> performLogin(
   }
 }
 
-Future<void> createUser(BuildContext context, String userName, String email,
+Future<void> GetContract(BuildContext context, String userName, String email,
     String password, String phoneNumber) async {
   final uri = Uri.parse('${Config.baseUrl}/');
   final response = await http.post(
