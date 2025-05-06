@@ -122,11 +122,30 @@ class _ProviderRequestsPage extends StatelessWidget {
                   child: const Text('Propose Price'),
                 ),
                 const SizedBox(width: 8),
-                TextButton(
-                  onPressed: () {
-                    // TODO: decline logic
-                  },
-                  child: const Text('Decline'),
+              TextButton(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (ctx) => AlertDialog(
+                      title: const Text('Confirmación'),
+                      content: const Text('¿Seguro que quieres rechazar el servicio?'),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.of(ctx).pop(),
+                          child: const Text('Cancelar'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(ctx).pop();
+                            // TODO: aquí va la lógica para declinar realmente el servicio
+                          },
+                          child: const Text('Rechazar'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
+                child: const Text('Decline'),
                 ),
               ],
             ),
