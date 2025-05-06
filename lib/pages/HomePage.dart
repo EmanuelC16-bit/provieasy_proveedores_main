@@ -175,16 +175,16 @@ class _ProviderRequestsPage extends StatelessWidget {
   }
 }
 
-class _AccountPage extends StatelessWidget {
-  const _AccountPage({Key? key}) : super(key: key);
+// class _AccountPage extends StatelessWidget {
+//   const _AccountPage({Key? key}) : super(key: key);
 
-  @override
-  Widget build(BuildContext context) {
-    return Center(
-      child: Text(
-        'Account',
-        style: TextStyle(fontSize: 16, color: Colors.black54),
-      ),
-    );
-  }
-}
+//   @override
+//   Widget build(BuildContext context) {
+//     return Center(
+//       child: Text(
+//         'Account',
+//         style: TextStyle(fontSize: 16, color: Colors.black54),
+//       ),
+//     );
+//   }
+// }
