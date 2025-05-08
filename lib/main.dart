@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provieasy_proveedores_main/pages/HomePage.dart';
+import 'package:provieasy_proveedores_main/services/Connection.dart';
 
 void main() {
   runApp(const ProviEasyProviderApp());
@@ -144,15 +145,19 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                       ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             // Navegar a la vista de proveedores
-                            Navigator.pushReplacement(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ProviderHomePage(),
-                              ),
-                            );
+                            // Navigator.pushReplacement(
+                              
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) => ProviderHomePage(),
+                            //   ),
+                            // );
+                            final email = _emailController.text.trim();
+                            final password = _passwordController.text;
+                            await performLogin(context, email, password);
                           }
                         },
                         style: ElevatedButton.styleFrom(

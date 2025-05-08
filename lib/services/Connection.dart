@@ -5,6 +5,7 @@ import 'package:logger/logger.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:provieasy_proveedores_main/AuthStorage.dart';
 import 'package:provieasy_proveedores_main/config.dart';
+import 'package:provieasy_proveedores_main/Pages/HomePage.dart';
 import 'package:provieasy_proveedores_main/services/NotificationService.dart' show NotificationService;
 // import 'package:provieasy_main_version/AuthStorage.dart';
 // import 'package:provieasy_main_version/services/NotificationService.dart';
@@ -53,7 +54,7 @@ Future<void> performLogin(
       );
 
       // Navigate to home, replacing login
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacement( context, MaterialPageRoute(builder: (context) => ProviderHomePage(),),);
     } else {
       _showErrorDialog(context, data['detail']);
     }
