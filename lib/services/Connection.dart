@@ -1,4 +1,5 @@
 import 'dart:convert';
+// import 'dart:nativewrappers/_internal/vm/lib/internal_patch.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
@@ -29,7 +30,27 @@ Future<void> performLogin(
     }),
   );
 
-  if (response.statusCode == 200) {
+  final responseUsrRole = await http.post(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'resolve': 'GetUser',
+        'selectionSetList': ['role'],
+        'arguments': {'email': email},
+      }),
+    );
+
+    final data2 = jsonDecode(responseUsrRole.body);
+    final rawData = data2['data'] as Map<String, dynamic>;
+    final role = rawData['role'] as String;
+    // final role = data2['role'];
+
+    print(
+      // responseUsrRole.body.toString()
+      role
+    );
+
+  if (response.statusCode == 200 && role == "provider") {
     final data = jsonDecode(response.body);
     final status = data['code'];
 
@@ -56,7 +77,7 @@ Future<void> performLogin(
       // Navigate to home, replacing login
       Navigator.pushReplacement( context, MaterialPageRoute(builder: (context) => ProviderHomePage(),),);
     } else {
-      _showErrorDialog(context, data['detail']);
+      // _showErrorDialog(context, data['detail']);
     }
   } else {
     final error = jsonDecode(response.body);
