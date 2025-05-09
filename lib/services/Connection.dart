@@ -43,12 +43,6 @@ Future<void> performLogin(
     final data2 = jsonDecode(responseUsrRole.body);
     final rawData = data2['data'] as Map<String, dynamic>;
     final role = rawData['role'] as String;
-    // final role = data2['role'];
-
-    print(
-      // responseUsrRole.body.toString()
-      role
-    );
 
   if (response.statusCode == 200 && role == "provider") {
     final data = jsonDecode(response.body);
