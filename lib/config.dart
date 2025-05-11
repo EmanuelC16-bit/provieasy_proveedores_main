@@ -15,7 +15,7 @@ class Config {
     } else if (Platform.isAndroid) {
       resolvedUrl = 'http://10.0.2.2:8000';
     } else if (Platform.isIOS) {
-      resolvedUrl = 'http://192.168.100.7:8000';
+      resolvedUrl = 'http://192.168.100.4:8000';
     } else if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
       resolvedUrl = 'http://localhost:8000';
     } else {

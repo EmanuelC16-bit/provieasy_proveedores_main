@@ -1,4 +1,5 @@
 import 'dart:convert';
+// import 'dart:ffi';
 // import 'dart:nativewrappers/_internal/vm/lib/internal_patch.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -42,9 +43,14 @@ Future<void> performLogin(
 
     final data2 = jsonDecode(responseUsrRole.body);
     final rawData = data2['data'] as Map<String, dynamic>;
-    final role = rawData['role'] as String;
+    final role = rawData['role'] as int;
+    
+    // a213100440@ceti.mx
+    
+    print(data2);
+    print(role);
 
-  if (response.statusCode == 200 && role == "provider") {
+  if (response.statusCode == 200 && role.toInt() == 2) {
     final data = jsonDecode(response.body);
     final status = data['code'];
 
@@ -57,7 +63,7 @@ Future<void> performLogin(
       await AuthStorage.saveToken(tokenType: tokenType, token: token);
       final payload = JwtDecoder.decode(token);
       await AuthStorage.saveUserId(payload['u'] as String);
-      await AuthStorage.saveUserRole(payload['r'] as String);
+      // await AuthStorage.saveUserRole(payload['r'] as String);
       final exp = payload['e'] as int;
       final expiry = DateTime.fromMillisecondsSinceEpoch(exp * 1000);
       await AuthStorage.saveTokenExpiry(expiry.toIso8601String());
@@ -79,22 +85,26 @@ Future<void> performLogin(
   }
 }
 
-Future<void> GetContract(BuildContext context, String userName, String email,
-    String password, String phoneNumber) async {
+Future<void> GetContract(
+  // BuildContext context, String userName, String email,
+    // String password, String phoneNumber
+    ) async {
   final uri = Uri.parse('${Config.baseUrl}/');
   final response = await http.post(
     uri,
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode({
-      'resolve': 'CreateUser',
-      'selectionSetList': [],
-      'arguments': {
-        'name': userName,
-        'email': email,
-        'role': 'client',
-        'phone': phoneNumber,
-        'password': password,
-      }
+      "resolve": "GetContracts",  
+      "selectionSetList": ["contract_id",
+        "provider_name",
+        "provider_id",
+        "status",
+        "request_date"],
+          "arguments": {
+            "offset": 0,
+        
+            "order": "desc"
+          }
     }),
   );
 
@@ -102,19 +112,21 @@ Future<void> GetContract(BuildContext context, String userName, String email,
     final data = jsonDecode(response.body);
     final status = data['code'];
 
+    print(data);
+
     if (status == 200 && data['data'] != null) {
       await NotificationService.showNotification(
         title: "Account created!",
         body: "Your account has been created successfully.",
       );
 
-      Navigator.pushReplacementNamed(context, '/login');
+      // Navigator.pushReplacementNamed(context, '/login');
     } else {
-      _showErrorDialog(context, data['detail']);
+      // _showErrorDialog(context, data['detail']);
     }
   } else {
     final error = jsonDecode(response.body);
-    _showErrorDialog(context, error['detail'] ?? 'Network Error');
+    // _showErrorDialog(context, error['detail'] ?? 'Network Error');
   }
 }
 

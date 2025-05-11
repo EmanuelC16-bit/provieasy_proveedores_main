@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provieasy_proveedores_main/pages/AccountPage.dart';
+import 'package:provieasy_proveedores_main/services/Connection.dart';
 import 'DetailsPage.dart';
 import 'package:provieasy_proveedores_main/pages/ProposalsPage.dart';
 
@@ -23,6 +24,7 @@ class _ProviderHomePageState extends State<ProviderHomePage> {
 
   void _onItemTapped(int index) {
     setState(() {
+      GetContract();
       _selectedIndex = index;
     });
   }
