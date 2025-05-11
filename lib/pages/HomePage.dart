@@ -24,7 +24,8 @@ class _ProviderHomePageState extends State<ProviderHomePage> {
 
   void _onItemTapped(int index) {
     setState(() {
-      GetContract();
+      GetContracts();
+      // GetProvider();
       _selectedIndex = index;
     });
   }
@@ -73,6 +74,7 @@ class _ProviderRequestsPage extends StatelessWidget {
     DateTime requestedAt,
     String requestId,
     double distance,
+
   ) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -117,6 +119,7 @@ class _ProviderRequestsPage extends StatelessWidget {
                           requestedAt: requestedAt,
                           requestId: requestId,
                           distance: distance,
+                          
                         ),
                       ),
                     );

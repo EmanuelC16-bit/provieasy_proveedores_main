@@ -7,8 +7,11 @@ import 'package:logger/logger.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:provieasy_proveedores_main/AuthStorage.dart';
 import 'package:provieasy_proveedores_main/config.dart';
-import 'package:provieasy_proveedores_main/Pages/HomePage.dart';
+// import 'package:provieasy_proveedores_main/Pages/HomePage.dart';
+// import 'package:provieasy_proveedores_main/Pages/HomePage_test.dart';
 import 'package:provieasy_proveedores_main/services/NotificationService.dart' show NotificationService;
+
+import '../pages/HomePage_test.dart';
 // import 'package:provieasy_main_version/AuthStorage.dart';
 // import 'package:provieasy_main_version/services/NotificationService.dart';
 // import 'package:provieasy_main_version/config.dart';
@@ -58,12 +61,13 @@ Future<void> performLogin(
       final rawData = data['data'] as Map<String, dynamic>;
       final tokenType = rawData['token_type'] as String;
       final token = rawData['token'] as String;
-
       // Persist token and decode claims
       await AuthStorage.saveToken(tokenType: tokenType, token: token);
       final payload = JwtDecoder.decode(token);
       await AuthStorage.saveUserId(payload['u'] as String);
-      // await AuthStorage.saveUserRole(payload['r'] as String);
+      // final providerId = payload['u'] as String;
+      // await AuthStorage.saveProviderId(providerId);
+      // // await AuthStorage.saveUserRole(payload['r'] as String);
       final exp = payload['e'] as int;
       final expiry = DateTime.fromMillisecondsSinceEpoch(exp * 1000);
       await AuthStorage.saveTokenExpiry(expiry.toIso8601String());
@@ -75,6 +79,7 @@ Future<void> performLogin(
       );
 
       // Navigate to home, replacing login
+      // ignore: use_build_context_synchronously
       Navigator.pushReplacement( context, MaterialPageRoute(builder: (context) => ProviderHomePage(),),);
     } else {
       // _showErrorDialog(context, data['detail']);
@@ -85,7 +90,54 @@ Future<void> performLogin(
   }
 }
 
-Future<void> GetContract(
+Future<Map<String, dynamic>> GetContracts() async { 
+  final String? userId = await AuthStorage.userId; 
+  final uri = Uri.parse('${Config.baseUrl}/');
+  final response = await http.post(
+    uri,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      "resolve": "GetContracts",  
+      "selectionSetList": ["contract_id",
+        "provider_name",
+        "provider_id",
+        "status",
+        "request_date"],
+          "arguments": {
+            "offset": 0,
+            "status": 1,
+            "provider_id": userId,
+            "order": "desc"
+          }
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    final status = data['code'];
+
+    print(data);
+
+    if (status == 200 && data['data'] != null) {
+      return jsonDecode(response.body);
+      // await NotificationService.showNotification(
+      //   title: "Account created!",
+      //   body: "Your account has been created successfully.",
+      // );
+
+      // Navigator.pushReplacementNamed(context, '/login');
+    } else {
+      // _showErrorDialog(context, data['detail']);
+      throw Exception('Failed to load contracts');
+    }
+  } else {
+    // final error = jsonDecode(response.body);
+    throw Exception('Failed to load contracts');
+    // _showErrorDialog(context, error['detail'] ?? 'Network Error');
+  }
+}
+
+Future<void> GetProvider(
   // BuildContext context, String userName, String email,
     // String password, String phoneNumber
     ) async {
@@ -125,7 +177,7 @@ Future<void> GetContract(
       // _showErrorDialog(context, data['detail']);
     }
   } else {
-    final error = jsonDecode(response.body);
+    // final error = jsonDecode(response.body);
     // _showErrorDialog(context, error['detail'] ?? 'Network Error');
   }
 }
