@@ -91,8 +91,8 @@ class _AccountPageState extends State<AccountPage> {
                     ),
                     CircleAvatar(
                       radius: 30,
-                      backgroundImage:
-                          const AssetImage('lib/assets/carpenter.png'),
+                      // backgroundImage:
+                      //     const AssetImage('lib/assets/carpenter.png'),
                       backgroundColor: Colors.grey[300],
                     ),
                   ],

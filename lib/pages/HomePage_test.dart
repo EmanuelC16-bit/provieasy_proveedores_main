@@ -100,7 +100,7 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
               children: [
                 const CircleAvatar(
                   radius: 24,
-                  backgroundImage: AssetImage('assets/profile_placeholder.png'),
+                  // backgroundImage: AssetImage('assets/profile_placeholder.png'),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

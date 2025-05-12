@@ -29,7 +29,7 @@ class ProposalsPage extends StatelessWidget {
               children: [
                 const CircleAvatar(
                   radius: 24,
-                  backgroundImage: AssetImage('assets/profile_placeholder.png'),
+                  // backgroundImage: AssetImage('assets/profile_placeholder.png'),
                 ),
                 const SizedBox(width: 12),
                 Expanded(

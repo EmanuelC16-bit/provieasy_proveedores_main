@@ -46,8 +46,15 @@ Future<void> performLogin(
 
     final data2 = jsonDecode(responseUsrRole.body);
     final rawData = data2['data'] as Map<String, dynamic>;
-    final role = rawData['role'] as int;
+    var role = 0;
     
+    try{
+      role = rawData['role'] as int;
+    } catch (error){
+       Exception(error);
+    }
+
+
     // a213100440@ceti.mx
     
     print(data2);
