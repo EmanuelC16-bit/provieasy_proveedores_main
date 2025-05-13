@@ -133,12 +133,23 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
+                  // onPressed: () async {
+                  //   final contractDetails = await GetContract(contract['contract_id']);
+                  //   Navigator.push(
+                  //     context,
+                  //     MaterialPageRoute(
+                  //       builder: (_) => ProviderRequestDetailsPage(
+                  //         contractData: contractDetails['data'],
+                  //       ),
+                  //     ),
+                  //   );
+                  // },
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
                         builder: (_) => ProviderRequestDetailsPage(
-                          contractData: contract,
+                          contractId: contract['contract_id'],
                         ),
                       ),
                     );

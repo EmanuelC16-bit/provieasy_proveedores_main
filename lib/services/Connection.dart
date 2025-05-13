@@ -1,6 +1,5 @@
 import 'dart:convert';
-// import 'dart:ffi';
-// import 'dart:nativewrappers/_internal/vm/lib/internal_patch.dart';
+import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
@@ -144,6 +143,46 @@ Future<Map<String, dynamic>> GetContracts() async {
   }
 }
 
+Future<Map<String, dynamic>> GetContract(String contractId) async { 
+  final uri = Uri.parse('${Config.baseUrl}/');
+  final response = await http.post(
+    uri,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      "resolve": "GetContract",
+      "selectionSetList": [
+        "contract_id",
+        "client_id",
+        "status",
+        "request_date", 
+        "contract_service/agreed_price",
+        "contract_service/user_request",
+        "contract_service/location_service",
+        "rating",
+        "contract_review/comment",
+        "contract_details/detail",
+        "contract_details/price"
+      ],
+      "arguments": {
+        "contract_id": contractId
+      }
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    final status = data['code'];
+
+    if (status == 200 && data['data'] != null) {
+      return data;
+    } else {
+      throw Exception('Failed to load contract details');
+    }
+  } else {
+    throw Exception('Failed to load contract details');
+  }
+}
+
 Future<void> GetProvider(
   // BuildContext context, String userName, String email,
     // String password, String phoneNumber
@@ -186,6 +225,36 @@ Future<void> GetProvider(
   } else {
     // final error = jsonDecode(response.body);
     // _showErrorDialog(context, error['detail'] ?? 'Network Error');
+  }
+}
+
+Future<void> UpdateContract(String contractId, Double agreedPrice) async {
+  final uri = Uri.parse('${Config.baseUrl}/');
+  final response = await http.post(
+    uri,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      "resolve": "UpdateContractDetail",
+      "selectionSetList": ["contract_detail_id", "contract_id", "detail", "price"],
+      "arguments":  {
+          "contract_detail_id": contractId,
+          
+          "price": agreedPrice
+    }
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    final status = data['code'];
+
+    if (status == 200 && data['data'] != null) {
+      return data;
+    } else {
+      throw Exception('Failed to load contract details');
+    }
+  } else {
+    throw Exception('Failed to load contract details');
   }
 }
 
