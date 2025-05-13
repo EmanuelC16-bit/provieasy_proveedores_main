@@ -1,23 +1,65 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provieasy_proveedores_main/services/Connection.dart';
 
-class ProposalsPage extends StatelessWidget {
+class ProposalsPage extends StatefulWidget {
   const ProposalsPage({Key? key}) : super(key: key);
 
-  Widget _sectionTitle(String title) => Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-        child: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-      );
+  @override
+  _ProposalsPageState createState() => _ProposalsPageState();
+}
 
-  Widget _proposalCard(
-    BuildContext context,
-    String clientName,
-    String serviceTitle,
-    double proposedPrice,
-    DateTime proposedAt,
-    double distance,
-    String proposalId,
-  ) {
+class _ProposalsPageState extends State<ProposalsPage> {
+  late Future<List<dynamic>> _proposalsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadProposals();
+  }
+
+  void _loadProposals() {
+    _proposalsFuture = GetProposals().then((response) {
+      if (response['code'] == 200) {
+        return response['data']['items'] as List<dynamic>;
+      }
+      throw Exception('Error fetching contracts');
+    });
+  }
+
+  String _mapStatus(int status) {
+    switch (status) {
+      case 1:
+        return 'Pending';
+      case 2:
+        return 'Approved';
+      case 3:
+        return 'Completed';
+      default:
+        return 'Unknown';
+    }
+  }
+
+  Color _getStatusColor(int status) {
+    switch (status) {
+      case 1:
+        return Colors.orange;
+      case 2:
+        return Colors.green;
+      case 3:
+        return Colors.blue;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  Widget _proposalCard(BuildContext context, dynamic contract) {
+    final dateFormat = DateFormat.yMMMd().add_jm();
+    final clientName = contract['provider_name'] as String? ?? 'No name';
+    final contractId = contract['contract_id'] as String? ?? '';
+    final status = contract['status'] as int? ?? 0;
+    final requestedAt = DateTime.parse(contract['request_date'] as String);
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Padding(
@@ -27,33 +69,51 @@ class ProposalsPage extends StatelessWidget {
           children: [
             Row(
               children: [
-                const CircleAvatar(
-                  radius: 24,
-                  // backgroundImage: AssetImage('assets/profile_placeholder.png'),
-                ),
+                const CircleAvatar(radius: 24),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(clientName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                  child: Text(
+                    clientName,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 8),
-            Text(serviceTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            Text(
+              'Service ID: ${contractId.substring(0, 8)}',
+              style:
+                  const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+            ),
             const SizedBox(height: 4),
-            Text('Proposed: \$${proposedPrice.toStringAsFixed(2)}', style: const TextStyle(fontSize: 14)),
+            Text(
+              'Status: ${_mapStatus(status)}',
+              style: TextStyle(color: _getStatusColor(status), fontSize: 14),
+            ),
             const SizedBox(height: 4),
-            Text('Distance: ${distance.toStringAsFixed(1)} km', style: const TextStyle(fontSize: 12, color: Colors.black54)),
-            const SizedBox(height: 4),
-            Text('On: ${DateFormat.yMMMd().add_jm().format(proposedAt)}', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            Text(
+              'Requested: ${dateFormat.format(requestedAt)}',
+              style: const TextStyle(fontSize: 12, color: Colors.black54),
+            ),
             const SizedBox(height: 12),
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {
-                  // TODO: navigate to proposal details using proposalId
-                },
-                child: const Text('View Details'),
-              ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                TextButton(
+                  onPressed: () {
+                    // TODO: navegar a detalles usando contractId
+                  },
+                  child: const Text('View Details'),
+                ),
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: () {
+                    // TODO: implementar Cancel si aplica
+                  },
+                  child: const Text('Cancel'),
+                ),
+              ],
             ),
           ],
         ),
@@ -63,39 +123,44 @@ class ProposalsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final List<Map<String, dynamic>> sample = [
-      {
-        'clientName': 'Emily Clark',
-        'serviceTitle': 'Home Cleaning',
-        'proposedPrice': 75.00,
-        'proposedAt': DateTime.now().subtract(const Duration(hours: 1)),
-        'distance': 3.4,
-        'proposalId': 'prop_001',
+    return FutureBuilder<List<dynamic>>(
+      future: _proposalsFuture,
+      builder: (context, snap) {
+        if (snap.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        if (snap.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Error al cargar propuestas'),
+                ElevatedButton(
+                  onPressed: _loadProposals,
+                  child: const Text('Reintentar'),
+                ),
+              ],
+            ),
+          );
+        }
+        final proposals = snap.data;
+        if (proposals == null || proposals.isEmpty) {
+          return const Center(child: Text('No hay propuestas enviadas'));
+        }
+        return ListView(
+          children: [
+            const SizedBox(height: 12),
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+              child: Text(
+                'Sent Proposals',
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+            ),
+            ...proposals.map((c) => _proposalCard(context, c)),
+          ],
+        );
       },
-      {
-        'clientName': 'Carlos Mendoza',
-        'serviceTitle': 'Gardening Service',
-        'proposedPrice': 120.50,
-        'proposedAt': DateTime.now().subtract(const Duration(hours: 3)),
-        'distance': 8.2,
-        'proposalId': 'prop_002',
-      },
-    ];
-
-    return ListView(
-      children: [
-        _sectionTitle('Sent Proposals'),
-        for (var p in sample)
-          _proposalCard(
-            context,
-            p['clientName'],
-            p['serviceTitle'],
-            p['proposedPrice'],
-            p['proposedAt'],
-            p['distance'],
-            p['proposalId'],
-          ),
-      ],
     );
   }
 }

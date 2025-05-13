@@ -146,6 +146,54 @@ Future<Map<String, dynamic>> GetContracts() async {
   }
 }
 
+Future<Map<String, dynamic>> GetProposals() async { 
+  final String? userId = await AuthStorage.userId; 
+  final uri = Uri.parse('${Config.baseUrl}/');
+  final response = await http.post(
+    uri,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      "resolve": "GetContracts",  
+      "selectionSetList": ["contract_id",
+        "provider_name",
+        "provider_id",
+        "status",
+        "request_date"],
+          "arguments": {
+            "offset": 0,
+            "status": 2,
+            "provider_id": userId,
+            "order": "desc"
+          }
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    final status = data['code'];
+
+    print(data);
+
+    if (status == 200 && data['data'] != null) {
+      return jsonDecode(response.body);
+      // await NotificationService.showNotification(
+      //   title: "Account created!",
+      //   body: "Your account has been created successfully.",
+      // );
+
+      // Navigator.pushReplacementNamed(context, '/login');
+    } else {
+      // _showErrorDialog(context, data['detail']);
+      throw Exception('Failed to load contracts');
+    }
+  } else {
+    // final error = jsonDecode(response.body);
+    throw Exception('Failed to load contracts');
+    // _showErrorDialog(context, error['detail'] ?? 'Network Error');
+  }
+}
+
+
 Future<Map<String, dynamic>> GetContract(String contractId) async { 
   final uri = Uri.parse(Config.baseUrl);
   final response = await http.post(

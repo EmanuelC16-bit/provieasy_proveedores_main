@@ -1,224 +1,101 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
-class ProviderRequestDetailsPage extends StatefulWidget {
-  final Map<String, dynamic> contractData;
+class ProposalsPage extends StatelessWidget {
+  const ProposalsPage({Key? key}) : super(key: key);
 
-  const ProviderRequestDetailsPage({
-    Key? key,
-    required this.contractData,
-  }) : super(key: key);
+  Widget _sectionTitle(String title) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+        child: Text(title, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+      );
 
-  @override
-  _ProviderRequestDetailsPageState createState() => _ProviderRequestDetailsPageState();
-}
-
-class _ProviderRequestDetailsPageState extends State<ProviderRequestDetailsPage> {
-  final TextEditingController _priceController = TextEditingController();
-  static const _baseColor = Color.fromARGB(255, 179, 157, 219);
-  late DateTime _requestDate;
-
-  String _mapStatus(int statusCode) {
-    switch (statusCode) {
-      case 1:
-        return 'Pending Approval';
-      case 2:
-        return 'Active';
-      case 3:
-        return 'Completed';
-      case 4:
-        return 'Cancelled';
-      default:
-        return 'Unknown Status';
-    }
-  }
-
-  Color _getStatusColor(int status) {
-    switch (status) {
-      case 1:
-        return Colors.orange;
-      case 2:
-        return Colors.green;
-      case 3:
-        return Colors.blue;
-      case 4:
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _requestDate = DateTime.parse(widget.contractData['request_date']);
+  Widget _proposalCard(
+    BuildContext context,
+    String clientName,
+    String serviceTitle,
+    double proposedPrice,
+    DateTime proposedAt,
+    double distance,
+    String proposalId,
+  ) {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const CircleAvatar(
+                  radius: 24,
+                  // backgroundImage: AssetImage('assets/profile_placeholder.png'),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(clientName, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            Text(serviceTitle, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+            const SizedBox(height: 4),
+            Text('Proposed: \$${proposedPrice.toStringAsFixed(2)}', style: const TextStyle(fontSize: 14)),
+            const SizedBox(height: 4),
+            Text('Distance: ${distance.toStringAsFixed(1)} km', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            const SizedBox(height: 4),
+            Text('On: ${DateFormat.yMMMd().add_jm().format(proposedAt)}', style: const TextStyle(fontSize: 12, color: Colors.black54)),
+            const SizedBox(height: 12),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton(
+                onPressed: () {
+                  // TODO: navigate to proposal details using proposalId
+                },
+                child: const Text('View Details'),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final dateFormat = DateFormat('MMM dd, yyyy - hh:mm a');
-    final screenWidth = MediaQuery.of(context).size.width;
+    final List<Map<String, dynamic>> sample = [
+      {
+        'clientName': 'Emily Clark',
+        'serviceTitle': 'Home Cleaning',
+        'proposedPrice': 75.00,
+        'proposedAt': DateTime.now().subtract(const Duration(hours: 1)),
+        'distance': 3.4,
+        'proposalId': 'prop_001',
+      },
+      {
+        'clientName': 'Carlos Mendoza',
+        'serviceTitle': 'Gardening Service',
+        'proposedPrice': 120.50,
+        'proposedAt': DateTime.now().subtract(const Duration(hours: 3)),
+        'distance': 8.2,
+        'proposalId': 'prop_002',
+      },
+    ];
 
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: Text(
-          'Contract #${widget.contractData['contract_id'].substring(0, 8).toUpperCase()}',
-          style: const TextStyle(color: Colors.black, fontSize: 18)),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-      ),
-      body: Padding(
-        padding: EdgeInsets.all(screenWidth > 600 ? 24 : 16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildDetailRow('Status:', 
-              Text(_mapStatus(widget.contractData['status']),
-                style: TextStyle(
-                  color: _getStatusColor(widget.contractData['status']),
-                  fontWeight: FontWeight.bold
-                ))
-            ),
-            const Divider(),
-            _buildDetailRow('Provider:', Text(widget.contractData['provider_name'])),
-            _buildDetailRow('Request Date:', Text(dateFormat.format(_requestDate))),
-            if (widget.contractData['estimated_price'] != null)
-              _buildDetailRow('Estimated Price:', 
-                Text('\$${widget.contractData['estimated_price'].toStringAsFixed(2)}')),
-            
-            const SizedBox(height: 24),
-            const Text('Submit Your Proposal', 
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            TextField(
-              controller: _priceController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                labelText: 'Proposed Amount',
-                prefixText: '\$',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  borderSide: const BorderSide(color: Colors.grey),
-                ),
-                contentPadding: const EdgeInsets.symmetric(
-                  vertical: 14, horizontal: 16),
-              ),
-              style: TextStyle(fontSize: screenWidth > 600 ? 18 : 16),
-            ),
-            const SizedBox(height: 20),
-            _buildActionButtons(context),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(String label, Widget value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          SizedBox(
-            width: 120,
-            child: Text(label, 
-              style: const TextStyle(
-                fontWeight: FontWeight.w500,
-                color: Colors.black54
-              )),
-          ),
-          const SizedBox(width: 16),
-          Expanded(child: value),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButtons(BuildContext context) {
-    final isLargeScreen = MediaQuery.of(context).size.width > 600;
-
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return ListView(
       children: [
-        OutlinedButton.icon(
-          icon: const Icon(Icons.cancel_outlined),
-          label: Text('Decline', 
-              style: TextStyle(fontSize: isLargeScreen ? 16 : 14)),
-          onPressed: () => _handleDecline(),
-          style: OutlinedButton.styleFrom(
-            foregroundColor: Colors.red,
-            side: const BorderSide(color: Colors.red),
-            padding: EdgeInsets.symmetric(
-              vertical: isLargeScreen ? 16 : 12,
-              horizontal: isLargeScreen ? 32 : 24
-            ),
+        _sectionTitle('Sent Proposals'),
+        for (var p in sample)
+          _proposalCard(
+            context,
+            p['clientName'],
+            p['serviceTitle'],
+            p['proposedPrice'],
+            p['proposedAt'],
+            p['distance'],
+            p['proposalId'],
           ),
-        ),
-        ElevatedButton.icon(
-          icon: const Icon(Icons.send),
-          label: Text('Send Proposal', 
-              style: TextStyle(
-                fontSize: isLargeScreen ? 16 : 14,
-                color: Colors.white
-              )),
-          onPressed: () => _submitProposal(),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: _baseColor,
-            padding: EdgeInsets.symmetric(
-              vertical: isLargeScreen ? 16 : 12,
-              horizontal: isLargeScreen ? 32 : 24
-            ),
-          ),
-        ),
       ],
-    );
-  }
-
-  void _submitProposal() {
-    final price = double.tryParse(_priceController.text);
-    if (price != null && price > 0) {
-      // TODO: Implementar lógica de envío con contractData['contract_id']
-      Navigator.pop(context);
-    } else {
-      showDialog(
-        context: context,
-        builder: (ctx) => AlertDialog(
-          title: const Text('Invalid Input'),
-          content: const Text('Please enter a valid price amount'),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.pop(ctx),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      );
-    }
-  }
-
-  void _handleDecline() {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        title: const Text('Confirm Decline'),
-        content: const Text('Are you sure you want to decline this contract?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(ctx);
-              // TODO: Implementar lógica de declive con contractData['contract_id']
-              Navigator.pop(context);
-            },
-            child: const Text('Confirm', style: TextStyle(color: Colors.red)),
-          ),
-        ],
-      ),
     );
   }
 }
