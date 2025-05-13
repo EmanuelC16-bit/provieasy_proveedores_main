@@ -228,15 +228,48 @@ class _ProviderRequestDetailsPageState extends State<ProviderRequestDetailsPage>
           ),
         ),
         ElevatedButton.icon(
-          icon: const Icon(Icons.send),
-          label: Text(
-            'Send Proposal',
-            style: TextStyle(fontSize: isLarge ? 16 : 14, color: Colors.white),
-          ),
-          onPressed: () {
-            // TODO: implement proposal submission
-            Navigator.pop(context);
-          },
+                        icon: const Icon(Icons.send),
+                        label: Text(
+                          'Send Proposal',
+                          style: TextStyle(fontSize: isLarge ? 16 : 14, color: Colors.white),
+                        ),
+                        onPressed: () async {
+                          final price = double.tryParse(_priceController.text);
+                          if (price != null && price > 0) {
+                            try {
+                              await UpdateContract(widget.contractId, price);
+                              Navigator.pop(context, true);
+                            } catch (e) {
+                              showDialog(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('Error'),
+                                  content: Text('Could not update contract. ' + e.toString()),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.pop(ctx),
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                          } else {
+                            showDialog(
+                              context: context,
+                              builder: (ctx) => AlertDialog(
+                                title: const Text('Invalid Input'),
+                                content: const Text('Please enter a valid price amount'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(ctx),
+                                    child: const Text('OK'),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
           style: ElevatedButton.styleFrom(
             backgroundColor: _baseColor,
             padding: EdgeInsets.symmetric(

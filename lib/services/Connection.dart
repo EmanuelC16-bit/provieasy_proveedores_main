@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:logger/logger.dart';
@@ -33,33 +32,33 @@ Future<void> performLogin(
     }),
   );
 
-  final responseUsrRole = await http.post(
-      uri,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({
-        'resolve': 'GetUser',
-        'selectionSetList': ['role'],
-        'arguments': {'email': email},
-      }),
-    );
+  // final responseUsrRole = await http.post(
+  //     uri,
+  //     headers: {'Content-Type': 'application/json'},
+  //     body: jsonEncode({
+  //       'resolve': 'GetUser',
+  //       'selectionSetList': ['role'],
+  //       'arguments': {'email': email},
+  //     }),
+  //   );
 
-    final data2 = jsonDecode(responseUsrRole.body);
-    final rawData = data2['data'] as Map<String, dynamic>;
-    var role = 0;
+    // final data2 = jsonDecode(responseUsrRole.body);
+    // final rawData = data2['data'] as Map<String, dynamic>;
+    // var role = 0;
     
-    try{
-      role = rawData['role'] as int;
-    } catch (error){
-       Exception(error);
-    }
+    // try{
+    //   role = rawData['role'] as int;
+    // } catch (error){
+    //    Exception(error);
+    // }
 
 
-    // a213100440@ceti.mx
+    // // a213100440@ceti.mx
     
-    print(data2);
-    print(role);
+    // print(data2);
+    // print(role);
 
-  if (response.statusCode == 200 && role.toInt() == 2) {
+  if (response.statusCode == 200) {
     final data = jsonDecode(response.body);
     final status = data['code'];
 
@@ -75,6 +74,7 @@ Future<void> performLogin(
       // await AuthStorage.saveProviderId(providerId);
       // // await AuthStorage.saveUserRole(payload['r'] as String);
       final exp = payload['e'] as int;
+      final role = payload['r'] as int;
       final expiry = DateTime.fromMillisecondsSinceEpoch(exp * 1000);
       await AuthStorage.saveTokenExpiry(expiry.toIso8601String());
 
@@ -86,7 +86,9 @@ Future<void> performLogin(
 
       // Navigate to home, replacing login
       // ignore: use_build_context_synchronously
+      if(role == 2){
       Navigator.pushReplacement( context, MaterialPageRoute(builder: (context) => ProviderHomePage(),),);
+      } else{_showErrorDialog(context, "User is not a provider");}
     } else {
       // _showErrorDialog(context, data['detail']);
     }
@@ -228,18 +230,29 @@ Future<void> GetProvider(
   }
 }
 
-Future<void> UpdateContract(String contractId, Double agreedPrice) async {
+Future<void> UpdateContract(String contractId, double agreedPrice) async {
   final uri = Uri.parse('${Config.baseUrl}/');
   final response = await http.post(
     uri,
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode({
-      "resolve": "UpdateContractDetail",
-      "selectionSetList": ["contract_detail_id", "contract_id", "detail", "price"],
-      "arguments":  {
-          "contract_detail_id": contractId,
+    //   "resolve": "UpdateContractDetail",
+    //   "selectionSetList": ["contract_detail_id", "contract_id", "detail", "price"],
+    //   "arguments":  {
+    //       "contract_id": contractId,
           
-          "price": agreedPrice
+    //       "price": agreedPrice
+    // }
+    "resolve": "UpdateContract",
+    "selectionSetList": ["contract_id", "client_id", "status", "contract_service/agreed_price", "contract_service/user_request", "contract_service/location_service"],
+    "arguments":  {
+        "contract_id": contractId,
+        // "client_id": "a260482c-9011-483b-aaeb-c61ab8b376a1",
+        // "token_signature_provider": "token_provider_signature",
+        "status": 2,
+        "contract_service": {
+            "agreed_price": agreedPrice
+        }
     }
     }),
   );
