@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provieasy_proveedores_main/pages/AccountPage.dart';
 import 'package:provieasy_proveedores_main/pages/DetailsPage_test.dart';
 import 'package:provieasy_proveedores_main/pages/ProposalsPage.dart';
+import 'package:provieasy_proveedores_main/pages/messages/chat_message_page.dart';
 import 'package:provieasy_proveedores_main/services/Connection.dart';
 
 const Color _baseColor = Color.fromARGB(255, 179, 157, 219);
@@ -72,12 +73,14 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
     _loadContracts();
   }
 
-  void _loadContracts() {
-    _contractsFuture = GetContracts().then((response) {
-      if (response['code'] == 200) {
-        return response['data']['items'];
-      }
-      throw Exception('Error fetching contracts');
+  Future<void> _loadContracts() async {
+    setState(() {
+      _contractsFuture = GetContracts().then((response) {
+        if (response['code'] == 200) {
+          return response['data']['items'];
+        }
+        throw Exception('Error fetching contracts');
+      });
     });
   }
 
@@ -88,7 +91,7 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
 
   Widget _requestCard(BuildContext context, dynamic contract) {
     final dateFormat = DateFormat.yMMMd().add_jm();
-    
+
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Padding(
@@ -100,7 +103,6 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
               children: [
                 const CircleAvatar(
                   radius: 24,
-                  // backgroundImage: AssetImage('assets/profile_placeholder.png'),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
@@ -133,17 +135,6 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 TextButton(
-                  // onPressed: () async {
-                  //   final contractDetails = await GetContract(contract['contract_id']);
-                  //   Navigator.push(
-                  //     context,
-                  //     MaterialPageRoute(
-                  //       builder: (_) => ProviderRequestDetailsPage(
-                  //         contractData: contractDetails['data'],
-                  //       ),
-                  //     ),
-                  //   );
-                  // },
                   onPressed: () {
                     Navigator.push(
                       context,
@@ -160,6 +151,24 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
                 TextButton(
                   onPressed: () => _showDeclineDialog(context, contract['contract_id']),
                   child: const Text('Decline'),
+                ),
+                const SizedBox(width: 8),
+                TextButton(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => ChatMessagePage(
+                          contractId: contract['contract_id'],
+                          senderId: contract['provider_id'],
+                          receiverId: contract['client_id'],
+                          providerName: 'Client',
+                          contractShortId: contract['contract_id'].substring(0, 6),
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Text('Chat'),
                 ),
               ],
             ),
@@ -212,39 +221,42 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<List<dynamic>>(
-      future: _contractsFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
-        }
+    return RefreshIndicator(
+      onRefresh: _loadContracts,
+      child: FutureBuilder<List<dynamic>>(
+        future: _contractsFuture,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
 
-        if (snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const Text('Error al cargar contratos'),
-                ElevatedButton(
-                  onPressed: _loadContracts,
-                  child: const Text('Reintentar'),
-                ),
-              ],
-            ),
+          if (snapshot.hasError) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text('Error al cargar contratos'),
+                  ElevatedButton(
+                    onPressed: _loadContracts,
+                    child: const Text('Reintentar'),
+                  ),
+                ],
+              ),
+            );
+          }
+
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return const Center(child: Text('No hay solicitudes pendientes'));
+          }
+
+          return ListView(
+            children: [
+              _sectionTitle('Solicitudes Pendientes'),
+              ...snapshot.data!.map((contract) => _requestCard(context, contract)).toList(),
+            ],
           );
-        }
-
-        if (!snapshot.hasData || snapshot.data!.isEmpty) {
-          return const Center(child: Text('No hay solicitudes pendientes'));
-        }
-
-        return ListView(
-          children: [
-            _sectionTitle('Solicitudes Pendientes'),
-            ...snapshot.data!.map((contract) => _requestCard(context, contract)).toList(),
-          ],
-        );
-      },
+        },
+      ),
     );
   }
 }

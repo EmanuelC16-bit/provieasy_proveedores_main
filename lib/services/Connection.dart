@@ -79,10 +79,10 @@ Future<void> performLogin(
       await AuthStorage.saveTokenExpiry(expiry.toIso8601String());
 
       logger.d("Login successful: $token");
-      await NotificationService.showNotification(
-        title: "Welcome back!",
-        body: "You're now logged in to ProvyEasy.",
-      );
+      // await NotificationService.showNotification(
+      //   title: "Welcome back!",
+      //   body: "You're now logged in to ProvyEasy.",
+      // );
 
       // Navigate to home, replacing login
       // ignore: use_build_context_synchronously
@@ -109,6 +109,7 @@ Future<Map<String, dynamic>> GetContracts() async {
       "selectionSetList": ["contract_id",
         "provider_name",
         "provider_id",
+        "client_id",
         "status",
         "request_date"],
           "arguments": {
@@ -215,10 +216,10 @@ Future<void> GetProvider(
     print(data);
 
     if (status == 200 && data['data'] != null) {
-      await NotificationService.showNotification(
-        title: "Account created!",
-        body: "Your account has been created successfully.",
-      );
+      // await NotificationService.showNotification(
+      //   title: "Account created!",
+      //   body: "Your account has been created successfully.",
+      // );
 
       // Navigator.pushReplacementNamed(context, '/login');
     } else {
