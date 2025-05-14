@@ -80,7 +80,7 @@ class UserService {
       required String email,
       required String phone}) async {
     final resp = await http.post(
-      Uri.parse('${Config.baseUrl}/'),
+      Uri.parse(Config.baseUrl),
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode({
         'resolve': 'UpdateUser',

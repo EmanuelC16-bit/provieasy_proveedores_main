@@ -27,6 +27,6 @@ class Config {
   }
 
   static Uri get baseUri {
-    return Uri.parse('${Config.baseUrl}/');
+    return Uri.parse(Config.baseUrl);
   }
 }

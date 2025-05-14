@@ -18,7 +18,7 @@ var logger = Logger();
 
 Future<void> performLogin(
     BuildContext context, String email, String password) async {
-  final uri = Uri.parse('${Config.baseUrl}/');
+  final uri = Uri.parse(Config.baseUrl);
   final response = await http.post(
     uri,
     headers: {'Content-Type': 'application/json'},
@@ -100,7 +100,7 @@ Future<void> performLogin(
 
 Future<Map<String, dynamic>> GetContracts() async { 
   final String? userId = await AuthStorage.userId; 
-  final uri = Uri.parse('${Config.baseUrl}/');
+  final uri = Uri.parse(Config.baseUrl);
   final response = await http.post(
     uri,
     headers: {'Content-Type': 'application/json'},
@@ -146,7 +146,7 @@ Future<Map<String, dynamic>> GetContracts() async {
 }
 
 Future<Map<String, dynamic>> GetContract(String contractId) async { 
-  final uri = Uri.parse('${Config.baseUrl}/');
+  final uri = Uri.parse(Config.baseUrl);
   final response = await http.post(
     uri,
     headers: {'Content-Type': 'application/json'},
@@ -189,7 +189,7 @@ Future<void> GetProvider(
   // BuildContext context, String userName, String email,
     // String password, String phoneNumber
     ) async {
-  final uri = Uri.parse('${Config.baseUrl}/');
+  final uri = Uri.parse(Config.baseUrl);
   final response = await http.post(
     uri,
     headers: {'Content-Type': 'application/json'},
@@ -231,7 +231,7 @@ Future<void> GetProvider(
 }
 
 Future<void> UpdateContract(String contractId, double agreedPrice) async {
-  final uri = Uri.parse('${Config.baseUrl}/');
+  final uri = Uri.parse(Config.baseUrl);
   final response = await http.post(
     uri,
     headers: {'Content-Type': 'application/json'},
