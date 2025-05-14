@@ -221,42 +221,61 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
 
   @override
   Widget build(BuildContext context) {
-    return RefreshIndicator(
-      onRefresh: _loadContracts,
-      child: FutureBuilder<List<dynamic>>(
-        future: _contractsFuture,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          }
+    return FutureBuilder<List<dynamic>>(
+      future: _contractsFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-          if (snapshot.hasError) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Text('Error al cargar contratos'),
-                  ElevatedButton(
-                    onPressed: _loadContracts,
-                    child: const Text('Reintentar'),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(child: Text('No hay solicitudes pendientes'));
-          }
-
-          return ListView(
-            children: [
-              _sectionTitle('Solicitudes Pendientes'),
-              ...snapshot.data!.map((contract) => _requestCard(context, contract)).toList(),
-            ],
+        if (snapshot.hasError) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Text('Error al cargar contratos'),
+                ElevatedButton(
+                  onPressed: _loadContracts,
+                  child: const Text('Reintentar'),
+                ),
+              ],
+            ),
           );
-        },
-      ),
+        }
+
+        final allContracts = snapshot.data;
+        if (allContracts == null || allContracts.isEmpty) {
+          return const Center(child: Text('No hay solicitudes'));
+        }
+
+        // Filtrar
+        final pending = allContracts.where((c) => c['status'] == 1).toList();
+        final inProgress = allContracts.where((c) => c['status'] == 3).toList();
+
+        return ListView(
+          children: [
+            // Sección Pendientes
+            _sectionTitle('Solicitudes Pendientes'),
+            if (pending.isNotEmpty)
+              ...pending.map((c) => _requestCard(context, c)).toList()
+            else
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Center(child: Text('No hay solicitudes pendientes')),
+              ),
+
+            // Sección En progreso
+            _sectionTitle('En progreso'),
+            if (inProgress.isNotEmpty)
+              ...inProgress.map((c) => _requestCard(context, c)).toList()
+            else
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 8),
+                child: Center(child: Text('No hay servicios en progreso')),
+              ),
+          ],
+        );
+      },
     );
   }
 }
