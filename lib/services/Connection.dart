@@ -15,7 +15,13 @@ import '../pages/HomePage_test.dart';
 // import 'package:provieasy_main_version/config.dart';
 
 var logger = Logger();
-
+const contractSelectionSetList = [
+  "contract_id",
+  "provider_name",
+  "provider_id",
+  "status",
+  "request_date"];
+  
 Future<void> performLogin(
     BuildContext context, String email, String password) async {
   final uri = Uri.parse(Config.baseUrl);
@@ -106,12 +112,7 @@ Future<Map<String, dynamic>> GetContracts() async {
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode({
       "resolve": "GetContracts",  
-      "selectionSetList": ["contract_id",
-        "provider_name",
-        "provider_id",
-        "client_id",
-        "status",
-        "request_date"],
+      "selectionSetList": contractSelectionSetList,
           "arguments": {
             "offset": 0,
             "status": 1,
@@ -148,17 +149,13 @@ Future<Map<String, dynamic>> GetContracts() async {
 
 Future<Map<String, dynamic>> GetProposals() async { 
   final String? userId = await AuthStorage.userId; 
-  final uri = Uri.parse('${Config.baseUrl}/');
+  final uri = Uri.parse(Config.baseUrl);
   final response = await http.post(
     uri,
     headers: {'Content-Type': 'application/json'},
     body: jsonEncode({
       "resolve": "GetContracts",  
-      "selectionSetList": ["contract_id",
-        "provider_name",
-        "provider_id",
-        "status",
-        "request_date"],
+      "selectionSetList": contractSelectionSetList,
           "arguments": {
             "offset": 0,
             "status": 2,
