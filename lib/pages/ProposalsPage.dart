@@ -28,6 +28,7 @@ class _ProposalsPageState extends State<ProposalsPage> {
   }
 
   String _mapStatus(int status) {
+    // status = 1 pending, 2.accepted, 3.completed, 4.canceled, 5.in progress, 6. reviewed
     switch (status) {
       case 1:
         return 'Pending';
@@ -35,6 +36,10 @@ class _ProposalsPageState extends State<ProposalsPage> {
         return 'Approved';
       case 3:
         return 'Completed';
+      case 4:
+        return 'Canceled';
+      case 5:
+        return 'In Progress';
       default:
         return 'Unknown';
     }
@@ -48,6 +53,10 @@ class _ProposalsPageState extends State<ProposalsPage> {
         return Colors.green;
       case 3:
         return Colors.blue;
+      case 4:
+        return Colors.red;
+      case 5:
+        return Colors.yellow;
       default:
         return Colors.grey;
     }
@@ -109,7 +118,7 @@ class _ProposalsPageState extends State<ProposalsPage> {
                 const SizedBox(width: 8),
                 TextButton(
                   onPressed: () {
-                    // TODO: implementar Cancel si aplica
+                    DeclineContract(contractId);
                   },
                   child: const Text('Cancel'),
                 ),

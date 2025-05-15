@@ -75,13 +75,16 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
 
   Future<void> _loadContracts() async {
     setState(() {
-      _contractsFuture = GetContracts().then((response) {
+      _contractsFuture = GetContracts(5).then((response) {
         if (response['code'] == 200) {
           return response['data']['items'];
         }
         throw Exception('Error fetching contracts');
+
       });
     });
+    
+   
   }
 
   Widget _sectionTitle(String title) => Padding(
@@ -183,6 +186,8 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
       case 1: return 'Pending';
       case 2: return 'Approved';
       case 3: return 'Completed';
+      case 4: return 'Canceled';
+      case 5: return 'In Progress';
       default: return 'Unknown';
     }
   }
@@ -192,6 +197,8 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
       case 1: return Colors.orange;
       case 2: return Colors.green;
       case 3: return Colors.blue;
+      case 4: return Colors.red;
+      case 5: return Colors.yellow;
       default: return Colors.grey;
     }
   }
@@ -210,7 +217,7 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
           TextButton(
             onPressed: () {
               Navigator.of(ctx).pop();
-              // TODO: Implementar lógica de rechazo
+              DeclineContract(contractId);
             },
             child: const Text('Rechazar'),
           ),
@@ -250,7 +257,7 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
 
         // Filtrar
         final pending = allContracts.where((c) => c['status'] == 1).toList();
-        final inProgress = allContracts.where((c) => c['status'] == 3).toList();
+        final inProgress = allContracts.where((c) => c['status'] == 5).toList();
 
         return ListView(
           children: [

@@ -19,6 +19,7 @@ const contractSelectionSetList = [
   "contract_id",
   "provider_name",
   "provider_id",
+  "client_id",
   "status",
   "request_date"];
   
@@ -104,7 +105,7 @@ Future<void> performLogin(
   }
 }
 
-Future<Map<String, dynamic>> GetContracts() async { 
+Future<Map<String, dynamic>> GetContracts(int status) async { 
   final String? userId = await AuthStorage.userId; 
   final uri = Uri.parse(Config.baseUrl);
   final response = await http.post(
@@ -115,7 +116,50 @@ Future<Map<String, dynamic>> GetContracts() async {
       "selectionSetList": contractSelectionSetList,
           "arguments": {
             "offset": 0,
-            "status": 1,
+            "status": status,
+            "provider_id": userId,
+            "order": "desc"
+          }
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    final status = data['code'];
+
+    print(data);
+
+    if (status == 200 && data['data'] != null) {
+      return jsonDecode(response.body);
+      // await NotificationService.showNotification(
+      //   title: "Account created!",
+      //   body: "Your account has been created successfully.",
+      // );
+
+      // Navigator.pushReplacementNamed(context, '/login');
+    } else {
+      // _showErrorDialog(context, data['detail']);
+      throw Exception('Failed to load contracts');
+    }
+  } else {
+    // final error = jsonDecode(response.body);
+    throw Exception('Failed to load contracts');
+    // _showErrorDialog(context, error['detail'] ?? 'Network Error');
+  }
+}
+
+Future<Map<String, dynamic>> GetContractsInProgress() async { 
+  final String? userId = await AuthStorage.userId; 
+  final uri = Uri.parse(Config.baseUrl);
+  final response = await http.post(
+    uri,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+      "resolve": "GetContracts",  
+      "selectionSetList": contractSelectionSetList,
+          "arguments": {
+            "offset": 0,
+            "status": 5,
             "provider_id": userId,
             "order": "desc"
           }
@@ -299,6 +343,45 @@ Future<void> UpdateContract(String contractId, double agreedPrice) async {
         "contract_service": {
             "agreed_price": agreedPrice
         }
+    }
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    final data = jsonDecode(response.body);
+    final status = data['code'];
+
+    if (status == 200 && data['data'] != null) {
+      return data;
+    } else {
+      throw Exception('Failed to load contract details');
+    }
+  } else {
+    throw Exception('Failed to load contract details');
+  }
+}
+
+Future<void> DeclineContract(String contractId) async {
+  final uri = Uri.parse(Config.baseUrl);
+  final response = await http.post(
+    uri,
+    headers: {'Content-Type': 'application/json'},
+    body: jsonEncode({
+    //   "resolve": "UpdateContractDetail",
+    //   "selectionSetList": ["contract_detail_id", "contract_id", "detail", "price"],
+    //   "arguments":  {
+    //       "contract_id": contractId,
+          
+    //       "price": agreedPrice
+    // }
+    "resolve": "UpdateContract",
+    "selectionSetList": ["contract_id", "client_id", "status", "contract_service/agreed_price", "contract_service/user_request", "contract_service/location_service"],
+    "arguments":  {
+        "contract_id": contractId,
+        // "client_id": "a260482c-9011-483b-aaeb-c61ab8b376a1",
+        // "token_signature_provider": "token_provider_signature",
+        "status": 4,
+        
     }
     }),
   );
