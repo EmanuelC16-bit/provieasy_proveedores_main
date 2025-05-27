@@ -75,7 +75,7 @@ class __ProviderRequestsPageState extends State<_ProviderRequestsPage> {
 
   Future<void> _loadContracts() async {
     setState(() {
-      _contractsFuture = GetContracts(5).then((response) {
+      _contractsFuture = GetContracts(1).then((response) {
         if (response['code'] == 200) {
           return response['data']['items'];
         }

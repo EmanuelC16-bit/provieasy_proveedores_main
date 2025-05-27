@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provieasy_proveedores_main/pages/AccountPage.dart';
 import 'package:provieasy_proveedores_main/pages/provider_request_page.dart';
-import 'package:provieasy_proveedores_main/services/Connection.dart';
+// import 'package:provieasy_proveedores_main/services/Connection.dart';
 import 'package:provieasy_proveedores_main/pages/ProposalsPage.dart';
 
 const Color _baseColor = Color.fromARGB(255, 179, 157, 219);
@@ -23,7 +23,7 @@ class _ProviderHomePageState extends State<ProviderHomePage> {
 
   void _onItemTapped(int index) {
     setState(() {
-      GetContracts();
+      // GetContracts();
       // GetProvider();
       _selectedIndex = index;
     });
